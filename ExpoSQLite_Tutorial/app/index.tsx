@@ -1,13 +1,8 @@
+// Able to access data everwhere in app, provider put it all together
 import { useSQLiteContext } from "expo-sqlite";
 import { useEffect, useState } from "react";
-import {
-  Button,
-  FlatList,
-  StyleSheet,
-  Text,
-  TextInput,
-  View,
-} from "react-native";
+import { Button, FlatList, StyleSheet, Text, TextInput, View, } from "react-native";
+// importing different functions and declared data type from this data file db
 import { fetchItems, insertItem, type Item } from "../data/db";
 import ItemRow from "./components/ItemRow";
 
@@ -66,8 +61,13 @@ export default function App() {
    *
    * @returns Promise that resolves when items are successfully loaded
    */
+
+  // async: task that needs time to be done and then returns promise. 
+  // Waits for task to be done. 
+  // Makes it so app doesn't seem like its frozen
   const loadItems = async () => {
     try {
+      //wait until fetchItems done. Not load data until data comes back
       const value = await fetchItems(db);
       setItems(value);
     } catch (err) {
@@ -89,6 +89,7 @@ export default function App() {
    * - Reload items to show the new entry
    * - Clear the form fields for the next entry
    */
+  // async b/c don't know how long it going to take
   const saveItem = async () => {
     // Validate name is not empty or just whitespace
     if (!name.trim()) return;

@@ -63,7 +63,9 @@ export const insertItem = async (
   db: SQLiteDatabase,
   name: string,
   quantity: number
-): Promise<void> => {
+): 
+// Promising to retun nothing
+Promise<void> => {
   await db.runAsync("INSERT INTO items (name, quantity) VALUES (?, ?);", [name, quantity]);
 };
 
@@ -78,6 +80,7 @@ export const insertItem = async (
  * @param db - The SQLite database instance
  * @returns Promise that resolves to an array of Item objects
  */
+// Promising to return an array of items
 export const fetchItems = async (db: SQLiteDatabase): Promise<Item[]> => {
   return db.getAllAsync<Item>("SELECT * FROM items;");
 };
