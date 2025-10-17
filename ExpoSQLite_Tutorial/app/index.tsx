@@ -3,9 +3,11 @@ import { useSQLiteContext } from "expo-sqlite";
 import { useEffect, useState } from "react";
 import { Button, FlatList, StyleSheet, Text, TextInput, View, } from "react-native";
 // importing different functions and declared data type from this data file db
+import Ionicons from '@expo/vector-icons/Ionicons';
 import { Alert } from "react-native";
-import { deleteItem, fetchItems, insertItem, updateItem, type Item } from "../data/db";
+import { deleteItem, fetchItems, insertItem, orderByQuantity, updateItem, type Item } from "../data/db";
 import ItemRow from "./components/ItemRow";
+
 
 export default function App() {
   /**
@@ -246,6 +248,14 @@ export default function App() {
       <Button
         title={editingId === null ? "Save Item" : "Update Item"}
         onPress={saveOrUpdate}
+      />
+      <Ionicons 
+        name="filter" size={24} color="black" 
+        onPress = { async () => {
+            const sortedItems = await orderByQuantity(db);
+            setItems(sortedItems);
+        }
+          }
       />
       <FlatList
         style={styles.list}

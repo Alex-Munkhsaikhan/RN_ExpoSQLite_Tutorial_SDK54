@@ -131,4 +131,8 @@ export const deleteItem = async (db: SQLiteDatabase, id: number): Promise<void> 
   await db.runAsync("DELETE FROM items WHERE id = ?;", [id]);
 };
 
+export const orderByQuantity = async (db: SQLiteDatabase): Promise<Item[]> => {
+  return db.getAllAsync<Item>("SELECT* FROM items ORDER BY quantity ASC;")
+}
+
 
