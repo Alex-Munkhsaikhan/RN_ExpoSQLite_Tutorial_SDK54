@@ -8,8 +8,7 @@ import { Alert } from "react-native";
 import { deleteItem, fetchItems, insertItem, orderByQuantity, updateItem, type Item } from "../data/db";
 import ItemRow from "./components/ItemRow";
 
-
-export default function App() {
+export default async function App() {
   /**
    * Database Access
    *
@@ -217,6 +216,16 @@ export default function App() {
     ]);
   };
 
+  const [sortOrder, setSortOrder] = useState<string>("desc");
+
+  const handleSortPress = async () => {
+    const newSortOrder = sortOrder === "asc" ? "desc" : "asc";
+    setSortOrder(newSortOrder);
+  };
+
+  const sortedItems = await orderByQuantity(db, newSortOrder.toUpperCase() as "ASC" | "DESC");
+  setItems(sortedItems);
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>SQLite Example</Text>
@@ -249,13 +258,11 @@ export default function App() {
         title={editingId === null ? "Save Item" : "Update Item"}
         onPress={saveOrUpdate}
       />
+
+    
       <Ionicons 
         name="filter" size={24} color="black" 
-        onPress = { async () => {
-            const sortedItems = await orderByQuantity(db);
-            setItems(sortedItems);
-        }
-          }
+        onPress = {handleSortPress}
       />
       <FlatList
         style={styles.list}
