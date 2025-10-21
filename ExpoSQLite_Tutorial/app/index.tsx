@@ -3,12 +3,12 @@ import { useSQLiteContext } from "expo-sqlite";
 import { useEffect, useState } from "react";
 import { Button, FlatList, StyleSheet, Text, TextInput, View, } from "react-native";
 // importing different functions and declared data type from this data file db
-import Ionicons from '@expo/vector-icons/Ionicons';
+import { Picker } from '@react-native-picker/picker';
 import { Alert } from "react-native";
-import { deleteItem, fetchItems, insertItem, orderByQuantity, updateItem, type Item } from "../data/db";
+import { deleteItem, fetchItems, fetchItemsSorted, insertItem, updateItem, type Item } from "../data/db";
 import ItemRow from "./components/ItemRow";
 
-export default async function App() {
+export default function App() {
   /**
    * Database Access
    *
@@ -218,13 +218,37 @@ export default async function App() {
 
   const [sortOrder, setSortOrder] = useState<string>("desc");
 
-  const handleSortPress = async () => {
-    const newSortOrder = sortOrder === "asc" ? "desc" : "asc";
-    setSortOrder(newSortOrder);
-  };
+  const handleSortChange = async (sortType: string) => {
+    let sortBy: "name" | "quantity" = "quantity";
+    let sortOrder: "ASC" | "DESC" = "DESC";
+    if (sortType === "name_asc") {
+      sortBy = "name";
+      sortOrder = "ASC";
+    } else if (sortType === "name_desc") {
+      sortBy = "name";
+      sortOrder = "DESC";
+    } else if (sortType === "quantity_asc") {
+      sortBy = "quantity";
+      sortOrder = "ASC";
+    } else if (sortType === "quantity_desc") {
+      sortBy = "quantity";
+      sortOrder = "DESC";
+    }
+    
+    const sorted = await fetchItemsSorted( db, sortBy, sortOrder);
+    setItems(sorted);
+};
 
-  const sortedItems = await orderByQuantity(db, newSortOrder.toUpperCase() as "ASC" | "DESC");
-  setItems(sortedItems);
+  const sortOptions = [
+    {label: "Name (A-Z)", value: "name_asc"},
+    {label: "Name (Z-A)", value: "name_desc"},
+    {label: "Quantity (Low to High)", value: "quantity_asc"},
+    {label: "Quantity (High to Low)", value: "quantity_desc"},
+  ]  ;
+
+  const [sortType, setSortType] = useState<string>("quantity_desc");
+
+
 
   return (
     <View style={styles.container}>
@@ -259,11 +283,24 @@ export default async function App() {
         onPress={saveOrUpdate}
       />
 
-    
-      <Ionicons 
-        name="filter" size={24} color="black" 
-        onPress = {handleSortPress}
-      />
+      <Picker
+        selectedValue={sortType}
+        onValueChange={async (itemValue) => {
+          setSortType(itemValue);
+          await handleSortChange(itemValue);
+        }
+        }
+        style = {{width: 200, height: 50, marginBottom: 100}}
+        >
+        {sortOptions.map((option) => (
+          <Picker.Item
+            key={option.value}
+            label={option.label}
+            value={option.value}
+          />
+        ))}
+      </Picker>
+
       <FlatList
         style={styles.list}
         data={items}
